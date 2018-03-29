@@ -3,6 +3,8 @@ var fs = require('fs');
 var Stats = require('.');
 
 test('default values', function(t) {
+	var restore = mockDateNow(Date.now());
+
 	var uid = process.getuid();
 	var gid = process.getgid();
 	var now = Date.now();
@@ -23,6 +25,8 @@ test('default values', function(t) {
 	t.equal(stat.ctime.getTime(), now, 'ctime ok');
 	t.equal(stat.birthtime.getTime(), now, 'birthtime ok');
 	t.end();
+
+	restore();
 });
 
 test('provide mode', function(t) {
@@ -44,6 +48,8 @@ test('provide mtime milliseconds', function(t) {
 });
 
 test('get/set atime milliseconds after creation', function(t) {
+	var restore = mockDateNow(Date.now());
+
 	var now = Date.now();
 	var stat = new Stats();
 
@@ -53,9 +59,13 @@ test('get/set atime milliseconds after creation', function(t) {
 
 	t.equal(stat.atime.getTime(), now + 1000, 'setter ok');
 	t.end();
+
+	restore();
 });
 
 test('get/set mtime milliseconds after creation', function(t) {
+	var restore = mockDateNow(Date.now());
+
 	var now = Date.now();
 	var stat = new Stats();
 
@@ -65,9 +75,13 @@ test('get/set mtime milliseconds after creation', function(t) {
 
 	t.equal(stat.mtime.getTime(), now + 1000, 'setter ok');
 	t.end();
+
+	restore();
 });
 
 test('get/set ctime milliseconds after creation', function(t) {
+	var restore = mockDateNow(Date.now());
+
 	var now = Date.now();
 	var stat = new Stats();
 
@@ -77,9 +91,13 @@ test('get/set ctime milliseconds after creation', function(t) {
 
 	t.equal(stat.ctime.getTime(), now + 1000, 'setter ok');
 	t.end();
+
+	restore();
 });
 
 test('get/set birthtime milliseconds after creation', function(t) {
+	var restore = mockDateNow(Date.now());
+
 	var now = Date.now();
 	var stat = new Stats();
 
@@ -89,6 +107,8 @@ test('get/set birthtime milliseconds after creation', function(t) {
 
 	t.equal(stat.birthtime.getTime(), now + 1000, 'setter ok');
 	t.end();
+
+	restore();
 });
 
 test('copy file stats', function(t) {
@@ -123,4 +143,17 @@ function compare(t, stat) {
 			t.equal(stat[method].valueOf(), copy[method].valueOf(), 'equal value for stat.' + method);
 		}
 	}
+}
+
+function mockDateNow(value) {
+	var original = Date.now;
+
+	Date.now = function() {
+		return value;
+	};
+
+	// restore original
+	return function() {
+		Date.now = original;
+	};
 }
