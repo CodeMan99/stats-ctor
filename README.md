@@ -1,4 +1,4 @@
-# stats-ctor
+# stats-ctor [![Build Status](https://travis-ci.org/CodeMan99/stats-ctor.svg?branch=master)](https://travis-ci.org/CodeMan99/stats-ctor)
 
 `fs.Stats` constructor with a sane signature and defaults.
 
