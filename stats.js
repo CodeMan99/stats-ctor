@@ -44,7 +44,9 @@ function Stats(init) {
 
 	if (typeof init === 'object' && init !== null) {
 		for (var key in init) {
-			this[key] = init[key];
+			if (Object.prototype.hasOwnProperty.call(init, key)) {
+				this[key] = init[key];
+			}
 		}
 	}
 
