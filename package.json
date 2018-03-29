@@ -1,0 +1,31 @@
+{
+  "name": "stats-ctor",
+  "version": "1.0.0",
+  "description": "fs.Stats constructor with a sane signature and defaults",
+  "main": "stats.js",
+  "scripts": {
+    "test": "tape test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CodeMan99/stats-ctor.git"
+  },
+  "keywords": [
+    "fs",
+    "stats",
+    "clone",
+    "copy",
+    "prototype",
+    "mode",
+    "stat"
+  ],
+  "author": "Cody A. Taylor <codemister99@yahoo.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CodeMan99/stats-ctor/issues"
+  },
+  "homepage": "https://github.com/CodeMan99/stats-ctor#readme",
+  "devDependencies": {
+    "tape": "^4.9.0"
+  }
+}
