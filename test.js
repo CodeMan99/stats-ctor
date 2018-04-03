@@ -2,9 +2,8 @@ var test = require('tape');
 var fs = require('fs');
 var Stats = require('.');
 
-test('default values', function(t) {
+test('default values', t => {
 	var restore = mockDateNow(Date.now());
-
 	var uid = process.getuid();
 	var gid = process.getgid();
 	var now = Date.now();
@@ -29,7 +28,7 @@ test('default values', function(t) {
 	restore();
 });
 
-test('provide mode', function(t) {
+test('provide mode', t => {
 	var stat = new Stats({
 		mode: 0o666
 	});
@@ -38,7 +37,7 @@ test('provide mode', function(t) {
 	t.end();
 });
 
-test('provide mtime milliseconds', function(t) {
+test('provide mtime milliseconds', t => {
 	var stat = new Stats({
 		mtim_msec: 31536000000
 	});
@@ -47,9 +46,8 @@ test('provide mtime milliseconds', function(t) {
 	t.end();
 });
 
-test('get/set atime milliseconds after creation', function(t) {
+test('get/set atime milliseconds after creation', t => {
 	var restore = mockDateNow(Date.now());
-
 	var now = Date.now();
 	var stat = new Stats();
 
@@ -63,9 +61,8 @@ test('get/set atime milliseconds after creation', function(t) {
 	restore();
 });
 
-test('get/set mtime milliseconds after creation', function(t) {
+test('get/set mtime milliseconds after creation', t => {
 	var restore = mockDateNow(Date.now());
-
 	var now = Date.now();
 	var stat = new Stats();
 
@@ -79,9 +76,8 @@ test('get/set mtime milliseconds after creation', function(t) {
 	restore();
 });
 
-test('get/set ctime milliseconds after creation', function(t) {
+test('get/set ctime milliseconds after creation', t => {
 	var restore = mockDateNow(Date.now());
-
 	var now = Date.now();
 	var stat = new Stats();
 
@@ -95,9 +91,8 @@ test('get/set ctime milliseconds after creation', function(t) {
 	restore();
 });
 
-test('get/set birthtime milliseconds after creation', function(t) {
+test('get/set birthtime milliseconds after creation', t => {
 	var restore = mockDateNow(Date.now());
-
 	var now = Date.now();
 	var stat = new Stats();
 
@@ -111,14 +106,22 @@ test('get/set birthtime milliseconds after creation', function(t) {
 	restore();
 });
 
-test('copy file stats', function(t) {
-	compare(t, fs.statSync(__filename));
-	t.end();
+test('copy file stats', t => {
+	fs.stat(__filename, (err, stat) => {
+		if (err) return t.end(err);
+
+		compare(t, stat);
+		t.end();
+	});
 });
 
-test('copy directory stats', function(t) {
-	compare(t, fs.statSync(__dirname));
-	t.end();
+test('copy directory stats', t => {
+	fs.stat(__dirname, (err, stat) => {
+		if (err) return t.end(err);
+
+		compare(t, stat);
+		t.end();
+	});
 });
 
 function compare(t, stat) {
@@ -148,12 +151,10 @@ function compare(t, stat) {
 function mockDateNow(value) {
 	var original = Date.now;
 
-	Date.now = function() {
-		return value;
-	};
+	Date.now = () => value;
 
 	// restore original
-	return function() {
+	return () => {
 		Date.now = original;
 	};
 }

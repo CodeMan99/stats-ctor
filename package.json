@@ -4,6 +4,7 @@
   "description": "fs.Stats constructor with a sane signature and defaults",
   "main": "stats.js",
   "scripts": {
+    "lint": "eslint *.js",
     "test": "tape test.js"
   },
   "repository": {
@@ -26,6 +27,7 @@
   },
   "homepage": "https://github.com/CodeMan99/stats-ctor#readme",
   "devDependencies": {
+    "eslint": "^4.19.1",
     "tape": "^4.9.0"
   }
 }
