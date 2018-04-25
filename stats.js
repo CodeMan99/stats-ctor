@@ -61,6 +61,7 @@ function Stats(init) {
 	}
 }
 
+Stats.super_ = fs.Stats;
 Stats.prototype = Object.create(fs.Stats.prototype, {
 	constructor: {
 		configurable: true,
@@ -68,13 +69,6 @@ Stats.prototype = Object.create(fs.Stats.prototype, {
 		value: Stats,
 		writable: true
 	}
-});
-
-Object.defineProperty(Stats, 'super_', {
-	configurable: true,
-	enumerable: false,
-	value: fs.Stats,
-	writable: true
 });
 
 // getTime/setTime using the constructor names
