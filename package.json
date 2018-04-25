@@ -1,6 +1,6 @@
 {
   "name": "stats-ctor",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "fs.Stats constructor with a sane signature and defaults",
   "main": "stats.js",
   "scripts": {
