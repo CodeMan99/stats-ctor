@@ -1,4 +1,6 @@
-var fs = require('fs');
+'use strict';
+
+const fs = require('fs');
 
 module.exports = Stats;
 
@@ -23,7 +25,7 @@ module.exports = Stats;
  * @param {Number} [init.birthtim_msec] (Default: `Date.now()`)
  */
 function Stats(init) {
-	var _now = Date.now();
+	const _now = Date.now();
 
 	fs.Stats.call(this,
 		0,    // dev
@@ -42,9 +44,14 @@ function Stats(init) {
 		_now  // birthtim_msec
 	);
 
+	// make these properties non-enumerable because they compete with
+	// 'atim_msec', 'mtim_msec', 'ctim_msec', & 'birthtim_msec' defined later
+	nonEnumerable(this, 'atimeMs', 'mtimeMs', 'ctimeMs', 'birthtimeMs');
+
 	if (typeof init === 'object' && init !== null) {
-		for (var key in init) {
-			if (Object.prototype.hasOwnProperty.call(init, key)) {
+		for (const key in init) {
+			// disallow custom properties
+			if (key in this) {
 				this[key] = init[key];
 			}
 		}
@@ -80,6 +87,7 @@ Object.defineProperties(Stats.prototype, {
 			return this.atime.getTime();
 		},
 		set: function(value) {
+			setIfOwnProperty(this, 'atimeMs', value);
 			this.atime.setTime(value);
 		}
 	},
@@ -90,6 +98,7 @@ Object.defineProperties(Stats.prototype, {
 			return this.mtime.getTime();
 		},
 		set: function(value) {
+			setIfOwnProperty(this, 'mtimeMs', value);
 			this.mtime.setTime(value);
 		}
 	},
@@ -100,6 +109,7 @@ Object.defineProperties(Stats.prototype, {
 			return this.ctime.getTime();
 		},
 		set: function(value) {
+			setIfOwnProperty(this, 'ctimeMs', value);
 			this.ctime.setTime(value);
 		}
 	},
@@ -110,7 +120,32 @@ Object.defineProperties(Stats.prototype, {
 			return this.birthtime.getTime();
 		},
 		set: function(value) {
+			setIfOwnProperty(this, 'birthtimeMs', value);
 			this.birthtime.setTime(value);
 		}
 	}
 });
+
+// TODO drop node v4.x support
+function nonEnumerable(self/* , ...names */) {
+	for (let i = 1; i < arguments.length; i++) {
+		const key = arguments[i];
+
+		if (self.hasOwnProperty(key)) {
+			const descriptor = Object.getOwnPropertyDescriptor(self, key);
+
+			if (descriptor.enumerable && descriptor.configurable) {
+				descriptor.enumerable = false;
+				Object.defineProperty(self, key, descriptor);
+			}
+		}
+	}
+
+	return self;
+}
+
+function setIfOwnProperty(self, key, value) {
+	if (self.hasOwnProperty(key)) {
+		return self[key] = value;
+	}
+}

@@ -1,13 +1,20 @@
-var test = require('tape');
-var fs = require('fs');
-var Stats = require('.');
+'use strict';
+
+const test = require('tape');
+const fs = require('fs');
+const Stats = require('.');
+const HAS_MS = (() => {
+	const stat = new fs.Stats();
+
+	return ['atimeMs', 'mtimeMs', 'ctimeMs', 'birthtimeMs'].every(key => stat.hasOwnProperty(key));
+})();
 
 test('default values', t => {
-	var restore = mockDateNow(Date.now());
-	var uid = process.getuid();
-	var gid = process.getgid();
-	var now = Date.now();
-	var stat = new Stats();
+	const restore = mockDateNow(Date.now());
+	const uid = process.getuid();
+	const gid = process.getgid();
+	const now = Date.now();
+	const stat = new Stats();
 
 	t.equal(stat.dev, 0, 'dev ok');
 	t.equal(stat.mode, 0, 'mode ok');
@@ -23,13 +30,25 @@ test('default values', t => {
 	t.equal(stat.mtime.getTime(), now, 'mtime ok');
 	t.equal(stat.ctime.getTime(), now, 'ctime ok');
 	t.equal(stat.birthtime.getTime(), now, 'birthtime ok');
+
+	if (HAS_MS) {
+		t.equal(stat.atimeMs, now, 'atimeMs ok');
+		t.equal(stat.mtimeMs, now, 'mtimeMs ok');
+		t.equal(stat.ctimeMs, now, 'ctimeMs ok');
+		t.equal(stat.birthtimeMs, now, 'birthtimeMs ok');
+		t.equal(stat.propertyIsEnumerable('atimeMs'), false, 'atimeMs non-enumerable');
+		t.equal(stat.propertyIsEnumerable('mtimeMs'), false, 'mtimeMs non-enumerable');
+		t.equal(stat.propertyIsEnumerable('ctimeMs'), false, 'ctimeMs non-enumerable');
+		t.equal(stat.propertyIsEnumerable('birthtimeMs'), false, 'birthtimeMs non-enumerable');
+	}
+
 	t.end();
 
 	restore();
 });
 
 test('provide mode', t => {
-	var stat = new Stats({
+	const stat = new Stats({
 		mode: 0o666
 	});
 
@@ -38,69 +57,94 @@ test('provide mode', t => {
 });
 
 test('provide mtime milliseconds', t => {
-	var stat = new Stats({
+	const stat = new Stats({
 		mtim_msec: 31536000000
 	});
 
 	t.equal(stat.mtime.getTime(), 31536000000, 'ok');
+
+	if (HAS_MS) {
+		t.equal(stat.mtimeMs, 31536000000, 'ok');
+	}
+
 	t.end();
 });
 
 test('get/set atime milliseconds after creation', t => {
-	var restore = mockDateNow(Date.now());
-	var now = Date.now();
-	var stat = new Stats();
+	const restore = mockDateNow(Date.now());
+	const now = Date.now();
+	const stat = new Stats();
 
 	t.equal(stat.atim_msec, now, 'getter ok');
 
 	stat.atim_msec = now + 1000;
 
 	t.equal(stat.atime.getTime(), now + 1000, 'setter ok');
+
+	if (HAS_MS) {
+		t.equal(stat.atimeMs, now + 1000, 'setter updated atimeMs ok');
+	}
+
 	t.end();
 
 	restore();
 });
 
 test('get/set mtime milliseconds after creation', t => {
-	var restore = mockDateNow(Date.now());
-	var now = Date.now();
-	var stat = new Stats();
+	const restore = mockDateNow(Date.now());
+	const now = Date.now();
+	const stat = new Stats();
 
 	t.equal(stat.mtim_msec, now, 'getter ok');
 
 	stat.mtim_msec = now + 1000;
 
 	t.equal(stat.mtime.getTime(), now + 1000, 'setter ok');
+
+	if (HAS_MS) {
+		t.equal(stat.mtimeMs, now + 1000, 'setter updated mtimeMs ok');
+	}
+
 	t.end();
 
 	restore();
 });
 
 test('get/set ctime milliseconds after creation', t => {
-	var restore = mockDateNow(Date.now());
-	var now = Date.now();
-	var stat = new Stats();
+	const restore = mockDateNow(Date.now());
+	const now = Date.now();
+	const stat = new Stats();
 
 	t.equal(stat.ctim_msec, now, 'getter ok');
 
 	stat.ctim_msec = now + 1000;
 
 	t.equal(stat.ctime.getTime(), now + 1000, 'setter ok');
+
+	if (HAS_MS) {
+		t.equal(stat.ctimeMs, now + 1000, 'setter updated ctimeMs ok');
+	}
+
 	t.end();
 
 	restore();
 });
 
 test('get/set birthtime milliseconds after creation', t => {
-	var restore = mockDateNow(Date.now());
-	var now = Date.now();
-	var stat = new Stats();
+	const restore = mockDateNow(Date.now());
+	const now = Date.now();
+	const stat = new Stats();
 
 	t.equal(stat.birthtim_msec, now, 'getter ok');
 
 	stat.birthtim_msec = now + 1000;
 
 	t.equal(stat.birthtime.getTime(), now + 1000, 'setter ok');
+
+	if (HAS_MS) {
+		t.equal(stat.birthtimeMs, now + 1000, 'setter updated birthtimeMs ok');
+	}
+
 	t.end();
 
 	restore();
@@ -125,19 +169,19 @@ test('copy directory stats', t => {
 });
 
 function compare(t, stat) {
-	var copy = new Stats(stat);
+	const copy = new Stats(stat);
 
 	t.ok(stat instanceof fs.Stats, 'original is an fs.Stat');
 	t.ok(copy instanceof fs.Stats, 'copy is an fs.Stat');
 	t.notEqual(stat, copy, 'not a shallow copy');
 
-	for (var prop in stat) {
+	for (const prop in stat) {
 		if (stat.hasOwnProperty(prop)) {
 			t.equal(stat[prop].valueOf(), copy[prop].valueOf(), 'equal value for stat.' + prop);
 		}
 	}
 
-	for (var method in Object.getPrototypeOf(stat)) {
+	for (const method in Object.getPrototypeOf(stat)) {
 		if (method.startsWith('_')) continue;
 
 		if (typeof stat[method] === 'function') {
@@ -149,7 +193,7 @@ function compare(t, stat) {
 }
 
 function mockDateNow(value) {
-	var original = Date.now;
+	const original = Date.now;
 
 	Date.now = () => value;
 

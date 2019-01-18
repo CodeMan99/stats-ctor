@@ -1,6 +1,6 @@
 # stats-ctor [![Build Status](https://travis-ci.org/CodeMan99/stats-ctor.svg?branch=master)](https://travis-ci.org/CodeMan99/stats-ctor)
 
-`fs.Stats` constructor with a sane signature and defaults.
+[`fs.Stats`](https://nodejs.org/dist/latest/docs/api/fs.html#fs_class_fs_stats) constructor with a sane signature and defaults.
 
 ## Usage
 
@@ -11,7 +11,7 @@ var Stats = require('stats-ctor');
 var stat = new Stats();
 
 console.log(stat.mode);  // 0
-console.log(stat.uid);   // 1000  -   from `process.getuid()`
+console.log(stat.uid);   // 1000  -  from `process.getuid()`
 console.log(stat.mtime); // 2018-03-29T17:01:48.883Z  -  from `new Date()`
 ```
 
@@ -44,7 +44,8 @@ console.log(stat.mtime.getTime() === copy.mtime.getTime()); // true  -  same for
 
 ### Stats([options])
 
-Identical to the `fs.Stats` constructor in node core, except it has a single options argument instead of fourteen named arguments.
+Identical to the `fs.Stats` constructor in node core, except it has a single
+options argument instead of _fourteen_ named arguments.
 
 #### options
 
@@ -137,24 +138,37 @@ This property creates a `Date` instance called `birthtime`.
 Type: `Number`
 
 A millisecond getter/setter for `atime`.
+<br>If available on the instance, setter will update `atimeMs`.
 
 #### Stats.prototype.mtim_msec
 
 Type: `Number`
 
 A millisecond getter/setter for `mtime`.
+<br>If available on the instance, setter will update `mtimeMs`.
 
 #### Stats.prototype.ctim_msec
 
 Type: `Number`
 
 A millisecond getter/setter for `ctime`.
+<br>If available on the instance, setter will update `ctimeMs`.
 
 #### Stats.prototype.birthtim_msec
 
 Type: `Number`
 
 A millisecond getter/setter for `birthtime`.
+<br>If available on the instance, setter will update `birthtimeMs`.
+
+## Warning
+
+Node added millisecond properties starting with *v8.1.0*. However, these are
+instance properties and are disconnected with the `Date` equivalent. For
+example, updating `stat.mtimeMs` will not update `stat.mtime`.
+
+As such this module makes `atimeMs`, `ctimeMs`, `mtimeMs`, & `birthtimeMs`
+non-enumerable. Instead use the prototype properties above.
 
 ## Related
 
