@@ -2,6 +2,10 @@
 
 [`fs.Stats`](https://nodejs.org/dist/latest/docs/api/fs.html#fs_class_fs_stats) constructor with a sane signature and defaults.
 
+## DEPRECATED
+
+The upstream `fs.Stats` constructor was deprecated as of nodejs v20.13.0 & v22.0.0
+
 ## Usage
 
 Sane defaults.
